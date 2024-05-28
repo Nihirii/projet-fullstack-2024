@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\RestaurantRepository;
+use App\Repository\LinkRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: RestaurantRepository::class)]
-class Restaurant
+#[ORM\Entity(repositoryClass: LinkRepository::class)]
+class Link
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -17,7 +17,7 @@ class Restaurant
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $url = null;
 
     #[ORM\Column(length: 25)]
     private ?string $status = null;
@@ -29,14 +29,14 @@ class Restaurant
     private ?\DateTimeInterface $updatedAt = null;
 
     /**
-     * @var Collection<int, Link>
+     * @var Collection<int, Restaurant>
      */
-    #[ORM\ManyToMany(targetEntity: Link::class, mappedBy: 'menu')]
-    private Collection $links;
+    #[ORM\ManyToMany(targetEntity: Restaurant::class, inversedBy: 'links')]
+    private Collection $menu;
 
     public function __construct()
     {
-        $this->links = new ArrayCollection();
+        $this->menu = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -44,14 +44,14 @@ class Restaurant
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getUrl(): ?string
     {
-        return $this->name;
+        return $this->url;
     }
 
-    public function setName(string $name): static
+    public function setUrl(string $url): static
     {
-        $this->name = $name;
+        $this->url = $url;
 
         return $this;
     }
@@ -93,28 +93,25 @@ class Restaurant
     }
 
     /**
-     * @return Collection<int, Link>
+     * @return Collection<int, Restaurant>
      */
-    public function getLinks(): Collection
+    public function getMenu(): Collection
     {
-        return $this->links;
+        return $this->menu;
     }
 
-    public function addLink(Link $link): static
+    public function addMenu(Restaurant $menu): static
     {
-        if (!$this->links->contains($link)) {
-            $this->links->add($link);
-            $link->addMenu($this);
+        if (!$this->menu->contains($menu)) {
+            $this->menu->add($menu);
         }
 
         return $this;
     }
 
-    public function removeLink(Link $link): static
+    public function removeMenu(Restaurant $menu): static
     {
-        if ($this->links->removeElement($link)) {
-            $link->removeMenu($this);
-        }
+        $this->menu->removeElement($menu);
 
         return $this;
     }
